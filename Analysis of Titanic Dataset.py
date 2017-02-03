@@ -1,8 +1,17 @@
 
 # coding: utf-8
 
-# # Analysis of Titanic Dataset
+# # Analysis of Kaggle's Titanic Dataset
 # Author: Daniel Pipkin
+
+# Write something about the Titanic here. The dataset contains demographic and passenger information about passengers on the Titanic.
+
+# ## Posing Questions
+
+# The two questions we are mainly focusing on:
+# * What factors made people more likely to survive? (Women, Children, Upper Class)
+#     More Women survived. What about children? More first-class passengers survived. Is there an alternative explanation.
+# * Was ticket price based on more than passenger class?
 
 # In[3]:
 
