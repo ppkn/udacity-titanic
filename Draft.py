@@ -153,6 +153,11 @@ plt.xlabel('Age in Years');
 pd.crosstab(titanic_data['Pclass'], titanic_data['Sex'], normalize=0).plot.bar(stacked=True);
 
 
+# In[1]:
+
+# Learned more about indexing here: http://tomaugspurger.github.io/modern-1.html
+
+
 # In[23]:
 
 import math
