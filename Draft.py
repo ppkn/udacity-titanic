@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[115]:
+# In[1]:
 
 get_ipython().magic('matplotlib inline')
 
@@ -61,14 +61,14 @@ deck_survived = titanic_data.groupby('Deck')['Survived'].sum()
 deck_counts = titanic_data.groupby('Deck')['PassengerId'].count()
 
 
-# In[24]:
+# In[9]:
 
 fig, axs = plt.subplots(1,2)
 deck_survived.plot(kind='bar', title='Survivor Counts', ax=axs[0]);
 deck_counts.plot(kind='bar', title='Overall Counts', ax=axs[1]);
 
 
-# In[73]:
+# In[10]:
 
 style.use('seaborn-pastel')
 def label_survived(num):
@@ -78,67 +78,67 @@ pd.crosstab(titanic_data['Deck'], titanic_data['Survived'].apply(label_survived)
 plt.legend(frameon=True);
 
 
-# In[118]:
+# In[11]:
 
 pd.crosstab(titanic_data['Pclass'], titanic_data['Survived'].apply(label_survived), normalize=0).plot.bar(stacked=True);
 # plt.legend(frameon=True);
 
 
-# In[120]:
+# In[12]:
 
 pd.crosstab(titanic_data['Pclass'], titanic_data['Survived'].apply(label_survived), normalize=0)['Survived'].plot.bar();
 # plt.legend(frameon=True);
 
 
-# In[12]:
+# In[13]:
 
 pd.crosstab(titanic_data['Sex'], titanic_data['Survived'], normalize=0, margins=True)
 
 
-# In[13]:
+# In[14]:
 
 pd.crosstab(titanic_data['Sex'], titanic_data['Survived'], normalize=1)
 
 
-# In[14]:
+# In[15]:
 
 pd.crosstab(titanic_data['Sex'], titanic_data['Survived'].apply(label_survived), normalize=0).plot.bar(stacked=True);
 
 
-# In[15]:
+# In[16]:
 
 # nifty trick found at: http://themrmax.github.io/2015/11/13/grouped-histograms-for-categorical-data-in-pandas.html
 ag = titanic_data.groupby('Pclass')['Embarked'].value_counts().sort_index()
 ag.unstack().plot(kind='bar', subplots=True)
 
 
-# In[72]:
+# In[17]:
 
 titanic_data.hist(by='Embarked', column='Fare');
 
 
-# In[44]:
+# In[24]:
 
 # binwidth trick found: http://stackoverflow.com/questions/6986986/bin-size-in-matplotlib-histogram
 binwidth = 50
 binned = np.arange(min(titanic_data['Fare']), max(titanic_data['Fare']), binwidth)
-titanic_data.groupby('Embarked')['Fare'].plot.hist(normed=True, bins=binned, stacked=True);
+titanic_data.groupby('Embarked')['Fare'].plot.hist(normed=True, alpha=0.66, bins=binned);
 plt.legend();
 
 
-# In[59]:
+# In[19]:
 
 by_survivors = titanic_data.groupby('Survived')
 by_class = titanic_data.groupby('Pclass')
 by_class['Fare'].mean().plot(kind='bar')
 
 
-# In[61]:
+# In[20]:
 
 titanic_data.plot.scatter(x='Age', y='Fare')
 
 
-# In[71]:
+# In[21]:
 
 def bin_width(width, column):
     min_val = titanic_data[column].min()
@@ -148,12 +148,12 @@ titanic_data.hist(by='Pclass', column='Age', bins=bin_width(5, 'Age'));
 plt.xlabel('Age in Years');
 
 
-# In[113]:
+# In[22]:
 
 pd.crosstab(titanic_data['Pclass'], titanic_data['Sex'], normalize=0).plot.bar(stacked=True);
 
 
-# In[111]:
+# In[23]:
 
 import math
 def is_estimated(age):
@@ -166,4 +166,14 @@ def normalize(series):
 titanic_data['Estimated'] = titanic_data['Age'].apply(is_estimated)
 estimated_pass = titanic_data[titanic_data['Estimated']]
 normalize(estimated_pass.groupby('Pclass').size()).plot(kind='bar');
+
+
+# In[ ]:
+
+from pandas.tools.plotting import scatter_matrix
+
+
+# In[29]:
+
+scatter_matrix(titanic_data, figsize=(8,8), diagonal='kde');
 
