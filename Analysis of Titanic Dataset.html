@@ -11752,7 +11752,7 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Analysis-of-Kaggle's-Titanic-Dataset">Analysis of Kaggle's Titanic Dataset<a class="anchor-link" href="#Analysis-of-Kaggle's-Titanic-Dataset">&#182;</a></h1><p>Author: Daniel Pipkin</p>
-<p>Data about the passengers aboard the Titanic has become popular in recent years. One of the reasons for this is that the data science site <a href="https://kaggle.com">Kaggle</a> uses it as an introduction to machine learning<sup>[1](#Footnotes)</sup></p>
+<p>Data about the passengers aboard the Titanic has become popular in recent years. One of the reasons for this is that the data science site <a href="https://kaggle.com">Kaggle</a> uses it as an introduction to machine learning.<sup>[1](#Footnotes)</sup></p>
 
 </div>
 </div>
@@ -11792,7 +11792,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import the titanic data</span>
@@ -11810,7 +11810,7 @@ div#notebook {
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[19]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[2]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -11936,24 +11936,47 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Posing-Questions">Posing Questions<a class="anchor-link" href="#Posing-Questions">&#182;</a></h2><p>The two questions we are mainly focusing on:</p>
 <ul>
-<li>What factors made people more likely to survive? (Women, Children, Upper Class)
-  More Women survived. What about children? More first-class passengers survived. Is there an alternative explanation.</li>
-<li>Was ticket price based on more than passenger class?</li>
+<li>What impact did sex, age, class, and cabin location have on chances of survival?</li>
+<li>Was ticket price based on more than passenger class, e.g. did the port of embarkation play a role?</li>
 </ul>
-<p>To answer these questions, I'm going to follow a simple loop:</p>
-<ol>
-<li>Hypothesize an explanation for the question.</li>
-<li>Gather items needed to investigate the hypothesis.</li>
-<li>Investigate the relationship with one or more visualizations.</li>
-<li>Draw a conclusion, then pose another hypothesis for further investigation.</li>
-</ol>
+<p><strong>Insert disclaimer about tenativeness of analysis here</strong></p>
 
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Remarks-about-Data-Cleaning-process">Remarks about Data Cleaning process<a class="anchor-link" href="#Remarks-about-Data-Cleaning-process">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In each step of the analysis, the data is prepared through a series of steps with annotations using a process called "method chaining". I find this process easy to follow because, as Tom Augspurger put it:</p>
+<blockquote><p>Code is read more often than it is written. <em>(...)</em> having the story of raw data to results be told as clearly as possible will save you time.<sup>[2](#Footnotes)</sup></p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Survivors">Survivors<a class="anchor-link" href="#Survivors">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[46]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>                     <span class="c1"># Count how many survived</span>
@@ -12187,7 +12210,7 @@ IhGj4hYRiRgVt4hIxKi4RUQiRsUtIhIxKm4RkYhRcYuIRMz/A1PX8+sGJCCOAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&quot;I'll-never-let-go,-Jack!&quot;">"I'll never let go, Jack!"<a class="anchor-link" href="#&quot;I'll-never-let-go,-Jack!&quot;">&#182;</a></h2><p>So what factors did contribute to the survival of some passengers? The one thing I remember from Titanic is that Jack dies and Rose lives. (That, and Leonardo Decaprio toasting like <a href="http://www.vulture.com/2013/06/gif-history-of-leo-dicaprio-raising-glasses.html">he does in every movie</a>). Let's use this as a starting point.<br>
+<h3 id="&quot;I'll-never-let-go,-Jack!&quot;">"I'll never let go, Jack!"<a class="anchor-link" href="#&quot;I'll-never-let-go,-Jack!&quot;">&#182;</a></h3><p>So what factors did contribute to the survival of some passengers? The one thing I remember from Titanic is that Jack dies and Rose lives. (That, and Leonardo Decaprio toasting like <a href="http://www.vulture.com/2013/06/gif-history-of-leo-dicaprio-raising-glasses.html">he does in every movie</a>). Let's use this as a starting point.<br>
 <strong>Hypothesis:</strong> Women survived more than men<br>
 Now it's time to gather the needed information.</p>
 
@@ -12196,21 +12219,7 @@ Now it's time to gather the needed information.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Most of this code is going to follow a convention described</span>
-<span class="c1"># in https://tomaugspurger.github.io/method-chaining.html</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[81]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">gender_survived_counts</span> <span class="o">=</span> <span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Survived&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="c1"># Select gender of just the survivors</span>
@@ -12234,7 +12243,7 @@ Now it's time to gather the needed information.</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[82]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">gender_survived_counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>     <span class="c1"># Rotate the labels to make them easy to read.</span>
@@ -12380,7 +12389,7 @@ AAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[84]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>  <span class="c1"># Count *all* passengers by gender</span>
@@ -12536,7 +12545,7 @@ fq29HH7bLNd/I3A5cBnDHOlUXgycnuSrwGb8uwGaG28H/mOSq5h+JmFPn++ahl+BIEmd84xekjpn
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">percent_survived</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">titanic_data</span><span class="p">):</span>
@@ -12555,7 +12564,7 @@ fq29HH7bLNd/I3A5cBnDHOlUXgycnuSrwGb8uwGaG28H/mOSq5h+JmFPn++ahl+BIEmd84xekjpn
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[83]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">percent_survived</span><span class="p">(</span><span class="s1">&#39;Sex&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">pipe_print</span><span class="p">)</span> <span class="c1"># Print percent of each gender that survived</span>
@@ -12713,14 +12722,14 @@ DTLcJalBhrskNchwl6QGGe6S1CDDXZIa9P8Bu15+5TAooIQAAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Women-and-Children-First">Women and Children First<a class="anchor-link" href="#Women-and-Children-First">&#182;</a></h2><p>Let's see how men, women, and children compare.</p>
+<h3 id="Women-and-Children-First">Women and Children First<a class="anchor-link" href="#Women-and-Children-First">&#182;</a></h3><p>Let's see how men, women, and children compare.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">to_mwch</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -12742,7 +12751,7 @@ DTLcJalBhrskNchwl6QGGe6S1CDDXZIa9P8Bu15+5TAooIQAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">MWCh</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>                   <span class="c1"># Set a Man, Woman, Child column</span>
@@ -12917,7 +12926,7 @@ ZcjhbmaWIYe7mVmGHO5mZhlyuJuZZcjhbmaWIYe7mVmG/j/shp6an4kn1gAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Stay-classy-1912">Stay classy 1912<a class="anchor-link" href="#Stay-classy-1912">&#182;</a></h2><blockquote><p>Woman: I didn't know we had a king!  I thought we were autonomous collective.<br>
+<h3 id="Stay-classy-1912">Stay classy 1912<a class="anchor-link" href="#Stay-classy-1912">&#182;</a></h3><blockquote><p>Woman: I didn't know we had a king!  I thought we were autonomous collective.<br>
 Dennis: You're fooling yourself!  We're living in a dictatorship!  A self-perpetuating autocracy in which the working <strong>classes</strong>--<br>
 Woman: There you go, bringing <strong>class</strong> into it again...</p>
 </blockquote>
@@ -12928,7 +12937,7 @@ Woman: There you go, bringing <strong>class</strong> into it again...</p>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[76]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">percent_survived</span><span class="p">(</span><span class="s1">&#39;Pclass&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># Plot the percent survivors for each Class</span>
@@ -13068,14 +13077,14 @@ NchpGUlqkOEuSQ0y3CWpQYa7JDXIcJekBhnuktQgw12SGvT/ATJQ93rVRlVFAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Deck">Deck<a class="anchor-link" href="#Deck">&#182;</a></h2><p>Maybe their deck had something to do with it.</p>
+<h3 id="Deck">Deck<a class="anchor-link" href="#Deck">&#182;</a></h3><p>Maybe their deck had something to do with it.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">to_deck</span><span class="p">(</span><span class="n">cabin</span><span class="p">):</span>
@@ -13096,7 +13105,7 @@ NchpGUlqkOEuSQ0y3CWpQYa7JDXIcJekBhnuktQgw12SGvT/ATJQ93rVRlVFAAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[85]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Deck</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>                  <span class="c1"># Set the deck column</span>
@@ -13274,7 +13283,7 @@ SUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[75]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">titanic_data</span><span class="p">[</span><span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Cabin&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;T&#39;</span><span class="p">]</span>
@@ -13288,7 +13297,7 @@ SUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[75]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[16]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div>
@@ -13359,7 +13368,7 @@ SUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[61]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">fares</span> <span class="o">=</span> <span class="n">titanic_data</span><span class="p">[</span><span class="s1">&#39;Fare&#39;</span><span class="p">]</span>
@@ -13374,7 +13383,7 @@ SUVORK5CYII=
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[61]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[17]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -13397,7 +13406,7 @@ Name: Fare, dtype: float64</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[86]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">ninetieth</span> <span class="o">=</span> <span class="n">fares</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.90</span><span class="p">)</span>   <span class="c1"># Get the value of the 90th percentile</span>
@@ -13552,9 +13561,18 @@ QH/rEQAAAABJRU5ErkJggg==
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Class-is-not-dismissed">Class is not dismissed<a class="anchor-link" href="#Class-is-not-dismissed">&#182;</a></h3>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Fare&#39;</span><span class="p">)</span> <span class="c1"># Reshape to make Pclass Series of fares</span>
@@ -13719,7 +13737,7 @@ ZlZwDnozs4Jz0JuZFZyD3sys4Bz0ZmYF56A3Myu4/w+9Bm37JhfHRwAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[87]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Pclass&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Fare&#39;</span><span class="p">)</span>
@@ -13849,14 +13867,13 @@ Z9BLUuMMeklqnEEvSY0z6CWpcQa9JDXOoJekxv1/lI+Jzd8GR2MAAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Maybe something to do with the deck they are on?</p>
-
+<h2 id="Deck-C-is-where-you-should-be">Deck C is where you should be<a class="anchor-link" href="#Deck-C-is-where-you-should-be">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[90]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Deck</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>              <span class="c1"># Add deck column</span>
@@ -14002,20 +14019,19 @@ jjPoJanjDHpJ6jiDXpI67v8DbRMP1rXvgcUAAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>How about ports because I want to mix things up with a line graph</p>
-
+<h3 id="Now-arriving-at...">Now arriving at...<a class="anchor-link" href="#Now-arriving-at...">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[91]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="p">(</span><span class="n">titanic_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Embarked&#39;</span><span class="p">,</span> <span class="s1">&#39;Pclass&#39;</span><span class="p">])</span> <span class="c1"># We&#39;ll want to split the fares up by class as well as embarked</span>
             <span class="p">[</span><span class="s1">&#39;Fare&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>                 <span class="c1"># Get the median for each port of embarkation for each class</span>
             <span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>                 <span class="c1"># Unstack class to columns</span>
-            <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="s1">&#39;SCQ&#39;</span><span class="p">))</span>             <span class="c1"># Rein</span>
+            <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="s1">&#39;SCQ&#39;</span><span class="p">))</span>             <span class="c1"># Reindex to put in chronological order</span>
             <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Price from Ports: By Class&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;figures/price_from_ports.png&#39;</span><span class="p">)</span>
@@ -14324,6 +14340,7 @@ hbuISAlSuIuIlKD/H4uTPnGBclEWAAAAAElFTkSuQmCC
 <li><a href="https://www.kaggle.com/c/titanic">https://www.kaggle.com/c/titanic</a><blockquote><p>If you're new to data science and machine learning, or looking for a simple intro to the Kaggle competitions platform, this is the best place to start.</p>
 </blockquote>
 </li>
+<li><a href="https://tomaugspurger.github.io/method-chaining.html">https://tomaugspurger.github.io/method-chaining.html</a></li>
 <li><a href="http://www.bbc.com/news/magazine-17515305">http://www.bbc.com/news/magazine-17515305</a><blockquote><p>Evidence given at the inquiry did suggest that initially some of the gates blocked the way of steerage passengers as stewards waited for instructions and that they were then opened, but only after most of the lifeboats had launched(...)<br>
 None of the evidence presented pointed to any malicious intent to obstruct third class passengers - but rather an oversight caused by unthinking obedience to the regulations, but the results were still deadly.</p>
 </blockquote>
