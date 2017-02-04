@@ -4,7 +4,7 @@
 # # Analysis of Kaggle's Titanic Dataset
 # Author: Daniel Pipkin
 # 
-# Write something about the Titanic here. The dataset contains demographic and passenger information about passengers on the Titanic.
+# Data about the passengers aboard the Titanic has become popular in recent years. One of the reasons for this is that the data science site [Kaggle](https://kaggle.com) uses it as an introduction to machine learning<sup>[1](#Footnotes)</sup>
 
 # In[1]:
 
@@ -21,6 +21,21 @@ from matplotlib import style
 style.use('seaborn-pastel')
 
 
+# ## Previewing Data
+# 
+# Before posing any questions, it is important to take a look at the data. Here are the first couple of rows.
+
+# In[19]:
+
+# Import the titanic data
+titanic_data = pd.read_csv('titanic-data.csv')
+
+# Print first couple of rows
+titanic_data.head()
+
+
+# Information about each column can be found [here](https://www.kaggle.com/c/titanic/data)
+
 # ## Posing Questions
 # 
 # The two questions we are mainly focusing on:
@@ -34,79 +49,84 @@ style.use('seaborn-pastel')
 # 3. Investigate the relationship with one or more visualizations.
 # 4. Draw a conclusion, then pose another hypothesis for further investigation.
 
+# In[46]:
+
+(titanic_data['Survived'].value_counts()                     # Count how many survived
+                         .rename({0: 'Died', 1: 'Survived'}) # Rename indicies
+                         .plot(kind='pie', figsize=(6, 6),
+                               autopct='%.2f%%'))            # Show percents
+plt.title('Percent Survivors')
+plt.savefig('figures/per_survivors.png')
+
+
 # ## "I'll never let go, Jack!"
 # 
 # So what factors did contribute to the survival of some passengers? The one thing I remember from Titanic is that Jack dies and Rose lives. (That, and Leonardo Decaprio toasting like [he does in every movie](http://www.vulture.com/2013/06/gif-history-of-leo-dicaprio-raising-glasses.html)). Let's use this as a starting point.  
 # **Hypothesis:** Women survived more than men  
 # Now it's time to gather the needed information.
 
-# In[2]:
+# In[ ]:
 
-# Import the titanic data
-titanic_data = pd.read_csv('titanic-data.csv')
-
-
-# This is what the first couple rows of data looks like.
-
-# In[3]:
-
-titanic_data.head()
+# Most of this code is going to follow a convention described
+# in https://tomaugspurger.github.io/method-chaining.html
 
 
-# It seems like the `Sex` column uses '`male`' and '`female`' values. Let's make sure that looks right.
+# In[81]:
 
-# In[4]:
-
-titanic_data['Sex'].unique()
-
-
-# Great! No surprises there. Now let's see how many of each group survived.
-
-# In[5]:
-
-# Kaggle's website talks about the meaning of the
-# 'Survived' column here: https://www.kaggle.com/c/titanic/data
-# -- 1 means they made it.
-titanic_data.loc[titanic_data['Survived'] == 1, 'Sex']             .value_counts()
+gender_survived_counts = (titanic_data.loc[titanic_data['Survived'] == 1, 'Sex'] # Select gender of just the survivors
+                                      .value_counts())                           # Get the counts of each gender
 
 
 # Wow! More than twice as many women survived than men, but it's much easier to notice those types of relationships in a chart.
 
-# In[6]:
+# In[82]:
 
-titanic_data.loc[titanic_data['Survived'] == 1, 'Sex']             .value_counts()             .plot(kind='bar', rot=0)
+gender_survived_counts.plot(kind='bar', rot=0)     # Rotate the labels to make them easy to read.
 plt.title('Num Survivors by Gender')
-plt.savefig('figures/num_survivors_by_gender.png')
+plt.savefig('figures/num_survivors_gender.png') # To track changes in version control, all charts will be saved
 
 
 # But this might be deceptive. Maybe there were just more women on the titanic.
 
-# In[19]:
+# In[7]:
 
 def pipe_print(x):
+    '''Prints *and* returns data
+    This is useful for printing out exact numbers before charting
+    '''
     print(x)
     return x
 
 
-# In[20]:
+# In[84]:
 
-titanic_data['Sex'].value_counts()                    .sort_index()                    .pipe(pipe_print)                    .plot(kind='bar', rot=0)
+(titanic_data['Sex'].value_counts()  # Count *all* passengers by gender
+                   .sort_index()     # Sort for consistent order of bars
+                   .pipe(pipe_print) # Print the exact counts
+                   .plot(kind='bar', rot=0))
 plt.title('Num Passengers by Gender')
-plt.savefig('figures/num_by_gender.png')
+plt.savefig('figures/num_gender.png')
 
 
 # Normalize view so that it represents proportion of population
 
-# In[9]:
+# In[ ]:
 
-def percent_survived(group, by='Survived', df=titanic_data):
-    return pd.crosstab(df[group], df[by], normalize=0)              .loc[:, 1]
+def percent_survived(group, df=titanic_data):
+    '''Returns a series of percentages of survivors
+    of each `group`
+    '''
+    return (pd.crosstab(df[group], df['Survived'],
+                        normalize=0) # Make conditional frequency table
+              .loc[:, 1])            # Get percentage of just the survivors ('Survived' == 1)
 
-normalized_mf_survivors = percent_survived('Sex')
-normalized_mf_survivors.plot(kind='bar', rot='0')
+
+# In[83]:
+
+(percent_survived('Sex').pipe(pipe_print) # Print percent of each gender that survived
+                        .plot(kind='bar', rot='0'))
 plt.title('% Survivors by Gender')
-plt.savefig('figures/per_survivors_by_gender.png')
-normalized_mf_survivors
+plt.savefig('figures/per_survivors_gender.png')
 
 
 # It looks like an even higher percentage of females survived compared to males
@@ -115,15 +135,27 @@ normalized_mf_survivors
 # 
 # Let's see how men, women, and children compare.
 
-# In[10]:
+# In[ ]:
 
 def to_mwch(df):
+    '''Returns whether a passenger is a child
+    and if not, just returns the gender of the passenger'''
+    
+    # I figure once someone hits their teens,
+    # they aren't a child anymore. 
     if df['Age'] < 14:
         return 'child'
     else:
         return df['Sex']
 
-titanic_data.assign(MWCh=lambda x:                             x.apply(to_mwch, axis=1))             .pipe((percent_survived, 'df'), 'MWCh')             .pipe(pipe_print)             .plot(kind='bar', rot='0')
+
+# In[10]:
+
+(titanic_data.assign(MWCh=lambda x:                   # Set a Man, Woman, Child column
+                            x.apply(to_mwch, axis=1)) # using the above function
+            .pipe((percent_survived, 'df'), 'MWCh')   # Get percent of survivors of each group
+            .pipe(pipe_print)                         # Print exact values
+            .plot(kind='bar', rot='0'))
 
 plt.title('% Survivors by Men, Women, and Children')
 plt.savefig('figures/per_survivors_mwch.png')
@@ -136,85 +168,148 @@ plt.savefig('figures/per_survivors_mwch.png')
 # 
 # Women and children first, but maybe class had something to do with it too. The lower class may have some injuries and would have been helped.
 
-# In[11]:
+# In[76]:
 
-percent_survived('Pclass').plot(kind='bar', rot=0)
+percent_survived('Pclass').plot(kind='bar', rot=0) # Plot the percent survivors for each Class
+plt.title('% Survivors by Class')
+plt.savefig('figures/per_survivors_class.png')
 
 
-# ## Cabin
+# The lower class passengers just had a harder time getting to the deck<sup>[2](#Footnotes)</sup>
+
+# ## Deck
 # Maybe their deck had something to do with it.
 
 # In[12]:
 
 def to_deck(cabin):
+    '''Return the deck letter of
+    a given cabin. It is just the first letter
+    of the cabin number'''
+    
     if pd.isnull(cabin):
         return 'No Info'
     else:
         return cabin[0]
 
 
-# In[13]:
+# In[85]:
 
-# titanic_data['Cabin'].apply(to_deck)
-titanic_data.assign(Deck=lambda x:                     x['Cabin'].apply(to_deck))             .pipe((percent_survived, 'df'), 'Deck')             .reindex(list('ABCDEFGT') + ['No Info'])             .pipe(pipe_print)             .plot(kind='bar')
+(titanic_data.assign(Deck=lambda x:                  # Set the deck column
+                    x['Cabin'].apply(to_deck))       # using the function above
+            .pipe((percent_survived, 'df'), 'Deck')  # Get percent of survivors of each deck
+            .reindex(list('ABCDEFGT') + ['No Info']) # Sort so 'No Info' shows last
+            .pipe(pipe_print)                        # Print exact values for each percentage
+            .plot(kind='bar'))
+plt.title('% Survivors by Deck')
+plt.savefig('figures/per_survivors_deck.png')
 
 
-# In[14]:
+# As expected, lower number of survivors in the 'No Info' group. If they had survived, there would be more info. What about people on deck T?
 
-# https://www.encyclopedia-titanica.org/titanic-victim/stephen-weart-blackwell.html
+# In[75]:
+
 titanic_data[titanic_data['Cabin'] == 'T']
 
+
+# He was the passenger staying on the boat deck<sup>[3](#Footnotes)</sup>, which might be why he was last seen in the smoking room talking to the Captain<sup>[4](#Footnotes)</sup>.
 
 # ## The Price is Right
 # 
 # I was wondering if some people had to pay different prices for different classes.
 
+# In[61]:
+
+fares = titanic_data['Fare']
+fares.describe()
+
+
+# In[86]:
+
+ninetieth = fares.quantile(0.90)   # Get the value of the 90th percentile
+bins = np.arange(0, ninetieth, 10) # Create equal sized bins up to the 90th percentile
+
+(titanic_data.loc[titanic_data['Fare'] < ninetieth, 'Fare'] # Only get fares up to 90th percentile
+             .hist(bins=bins))
+plt.title('Fares of the Bottom 90%')
+plt.savefig('figures/fares_bottom_90.png')
+
+
 # In[15]:
 
-titanic_data.pivot(columns='Pclass', values='Fare')             .plot(kind='box')
+(titanic_data.pivot(columns='Pclass', values='Fare') # Reshape to make Pclass Series of fares
+             .plot(kind='box'))
 plt.title('Spread of Prices by Class (with outliers)')
 plt.savefig('figures/class_price_spread_w_outliers.png')
 
 
-# In[16]:
+# In[87]:
 
-def remove_outliers(series):
-    iqr = series.quantile(0.75) - series.quantile(0.25)
-    median = series.quantile(0.5)
-    bools = (series > median - 1.5 * iqr) & (series < median + 1.5 * iqr)
-    print('Median of {}: {}'.format(series.name, median))
-    return series[bools]
-titanic_data.pivot(columns='Pclass', values='Fare')             .apply(remove_outliers)             .plot(kind='box')
+(titanic_data.pivot(columns='Pclass', values='Fare')
+             .plot(kind='box', showfliers=False)) # Remove outliers
 plt.title('Spread of Prices by Class')
 plt.savefig('figures/class_price_spread.png')
 
 
 # Maybe something to do with the deck they are on?
 
-# In[17]:
+# In[90]:
 
-(titanic_data.assign(Deck=lambda x:
-                    x['Cabin'].apply(to_deck))
+(titanic_data.assign(Deck=lambda x:              # Add deck column
+                    x['Cabin'].apply(to_deck))   # using function from above
             .pivot(columns='Deck', values='Fare')
-            [list('ABCDEFG') + ['No Info']]  # Remove T because only one value
-            .apply(remove_outliers)
-            .plot(kind='box'))
-print('Value  of T: {}'
-      .format(titanic_data.loc[titanic_data['Cabin'] == 'T', 'Fare']
-             .iloc[0]))
+            [list('ABCDEFGT') + ['No Info']]     # Sort so No Info shows last
+            .plot(kind='box', showfliers=False)) # Remove outliers
 plt.title('Spread of Prices by Deck')
 plt.savefig('figures/deck_price_spread.png')
 
 
 # How about ports because I want to mix things up with a line graph
 
-# In[18]:
+# In[91]:
 
-(titanic_data.groupby(['Embarked', 'Pclass'])
-            ['Fare'].median()
-            .unstack(level=1)
-            .reindex(list('SCQ'))
-        .plot(subplots=True, figsize=(6, 6)))
+(titanic_data.groupby(['Embarked', 'Pclass']) # We'll want to split the fares up by class as well as embarked
+            ['Fare'].median()                 # Get the median for each port of embarkation for each class
+            .unstack(level=1)                 # Unstack class to columns
+            .reindex(list('SCQ'))             # Rein
+            .plot(subplots=True, figsize=(6, 6)))
 plt.gcf().suptitle('Price from Ports: By Class')
 plt.gcf().savefig('figures/price_from_ports.png')
 
+
+# # Footnotes
+# 1. https://www.kaggle.com/c/titanic
+# > If you're new to data science and machine learning, or looking for a simple intro to the Kaggle competitions platform, this is the best place to start.
+# 1. http://www.bbc.com/news/magazine-17515305
+# > Evidence given at the inquiry did suggest that initially some of the gates blocked the way of steerage passengers as stewards waited for instructions and that they were then opened, but only after most of the lifeboats had launched(...)  
+# > None of the evidence presented pointed to any malicious intent to obstruct third class passengers - but rather an oversight caused by unthinking obedience to the regulations, but the results were still deadly.  
+# 1. https://www.kaggle.com/c/titanic/data  
+# 
+# ```
+# VARIABLE DESCRIPTIONS:
+# survival        Survival
+#                 (0 = No; 1 = Yes)
+# pclass          Passenger Class
+#                 (1 = 1st; 2 = 2nd; 3 = 3rd)
+# name            Name
+# sex             Sex
+# age             Age
+# sibsp           Number of Siblings/Spouses Aboard
+# parch           Number of Parents/Children Aboard
+# ticket          Ticket Number
+# fare            Passenger Fare
+# cabin           Cabin
+# embarked        Port of Embarkation
+#                 (C = Cherbourg; Q = Queenstown; S = Southampton)
+# SPECIAL NOTES:
+# Pclass is a proxy for socio-economic status (SES)
+#  1st ~ Upper; 2nd ~ Middle; 3rd ~ Lower
+# 
+# Age is in Years; Fractional if Age less than One (1)
+#  If the Age is Estimated, it is in the form xx.5
+# 
+# With respect to the family relation variables (i.e. sibsp and parch)
+# some relations were ignored.
+# ```
+# 1. https://www.encyclopedia-titanica.org/titanic-victim/stephen-weart-blackwell.html
+# 1. https://www.encyclopedia-titanica.org/cabins.html
