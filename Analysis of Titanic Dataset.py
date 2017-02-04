@@ -62,49 +62,47 @@ titanic_data['Sex'].unique()
 
 # Great! No surprises there. Now let's see how many of each group survived.
 
-# In[59]:
+# In[5]:
 
 # Kaggle's website talks about the meaning of the
 # 'Survived' column here: https://www.kaggle.com/c/titanic/data
 # -- 1 means they made it.
-survivors_mf = titanic_data.loc[titanic_data['Survived'] == 1, 'Sex']
-survivors_mf.value_counts()
-
-
-# In[5]:
-
-# Because 0 means no and 1 means yes, we can sum the `Survived` column to find total survivors
-survivors_by_mf = titanic_data.groupby('Sex')['Survived'].sum()
-survivors_by_mf
+titanic_data.loc[titanic_data['Survived'] == 1, 'Sex']             .value_counts()
 
 
 # Wow! More than twice as many women survived than men, but it's much easier to notice those types of relationships in a chart.
 
-# In[43]:
+# In[6]:
 
-survivors_by_mf.plot(kind='bar', rot=0)
+titanic_data.loc[titanic_data['Survived'] == 1, 'Sex']             .value_counts()             .plot(kind='bar', rot=0)
 plt.title('Num Survivors by Gender')
 plt.savefig('figures/num_survivors_by_gender.png')
 
 
-# By this might be deceptive. Maybe there were just more women on the titanic.
+# But this might be deceptive. Maybe there were just more women on the titanic.
 
-# In[47]:
+# In[19]:
 
-passengers_by_mf = titanic_data['Sex']
-passengers_by_mf.value_counts()                 .loc[['female', 'male']]                 .plot(kind='bar', rot=0)
+def pipe_print(x):
+    print(x)
+    return x
+
+
+# In[20]:
+
+titanic_data['Sex'].value_counts()                    .sort_index()                    .pipe(pipe_print)                    .plot(kind='bar', rot=0)
 plt.title('Num Passengers by Gender')
-passengers_by_mf.value_counts()
+plt.savefig('figures/num_by_gender.png')
 
 
 # Normalize view so that it represents proportion of population
 
-# In[84]:
+# In[9]:
 
-def group_normalize(group, by='Survived', df=titanic_data):
-    return pd.crosstab(df[group], df[by], normalize=0)
+def percent_survived(group, by='Survived', df=titanic_data):
+    return pd.crosstab(df[group], df[by], normalize=0)              .loc[:, 1]
 
-normalized_mf_survivors = group_normalize('Sex')                           .loc[:, 1]
+normalized_mf_survivors = percent_survived('Sex')
 normalized_mf_survivors.plot(kind='bar', rot='0')
 plt.title('% Survivors by Gender')
 plt.savefig('figures/per_survivors_by_gender.png')
@@ -117,20 +115,106 @@ normalized_mf_survivors
 # 
 # Let's see how men, women, and children compare.
 
-# In[90]:
+# In[10]:
 
-def to_mwch(row):
-    if row['Age'] < 14:
+def to_mwch(df):
+    if df['Age'] < 14:
         return 'child'
     else:
-        return row['Sex']
+        return df['Sex']
 
-mwch = titanic_data.apply(to_mwch, axis=1)
-with_mwch = titanic_data.assign(MWCh=mwch)
+titanic_data.assign(MWCh=lambda x:                             x.apply(to_mwch, axis=1))             .pipe((percent_survived, 'df'), 'MWCh')             .pipe(pipe_print)             .plot(kind='bar', rot='0')
 
-normalized_mwch_survivors = group_normalize('MWCh', df=with_mwch)                             .loc[:, 1]
-normalized_mwch_survivors.plot(kind='bar', rot='0')
 plt.title('% Survivors by Men, Women, and Children')
 plt.savefig('figures/per_survivors_mwch.png')
-normalized_mwch_survivors
+
+
+# ## Stay classy 1912
+# > Woman: I didn't know we had a king!  I thought we were autonomous collective.  
+# > Dennis: You're fooling yourself!  We're living in a dictatorship!  A self-perpetuating autocracy in which the working **classes**--  
+# > Woman: There you go, bringing **class** into it again...  
+# 
+# Women and children first, but maybe class had something to do with it too. The lower class may have some injuries and would have been helped.
+
+# In[11]:
+
+percent_survived('Pclass').plot(kind='bar', rot=0)
+
+
+# ## Cabin
+# Maybe their deck had something to do with it.
+
+# In[12]:
+
+def to_deck(cabin):
+    if pd.isnull(cabin):
+        return 'No Info'
+    else:
+        return cabin[0]
+
+
+# In[13]:
+
+# titanic_data['Cabin'].apply(to_deck)
+titanic_data.assign(Deck=lambda x:                     x['Cabin'].apply(to_deck))             .pipe((percent_survived, 'df'), 'Deck')             .reindex(list('ABCDEFGT') + ['No Info'])             .pipe(pipe_print)             .plot(kind='bar')
+
+
+# In[14]:
+
+# https://www.encyclopedia-titanica.org/titanic-victim/stephen-weart-blackwell.html
+titanic_data[titanic_data['Cabin'] == 'T']
+
+
+# ## The Price is Right
+# 
+# I was wondering if some people had to pay different prices for different classes.
+
+# In[15]:
+
+titanic_data.pivot(columns='Pclass', values='Fare')             .plot(kind='box')
+plt.title('Spread of Prices by Class (with outliers)')
+plt.savefig('figures/class_price_spread_w_outliers.png')
+
+
+# In[16]:
+
+def remove_outliers(series):
+    iqr = series.quantile(0.75) - series.quantile(0.25)
+    median = series.quantile(0.5)
+    bools = (series > median - 1.5 * iqr) & (series < median + 1.5 * iqr)
+    print('Median of {}: {}'.format(series.name, median))
+    return series[bools]
+titanic_data.pivot(columns='Pclass', values='Fare')             .apply(remove_outliers)             .plot(kind='box')
+plt.title('Spread of Prices by Class')
+plt.savefig('figures/class_price_spread.png')
+
+
+# Maybe something to do with the deck they are on?
+
+# In[17]:
+
+(titanic_data.assign(Deck=lambda x:
+                    x['Cabin'].apply(to_deck))
+            .pivot(columns='Deck', values='Fare')
+            [list('ABCDEFG') + ['No Info']]  # Remove T because only one value
+            .apply(remove_outliers)
+            .plot(kind='box'))
+print('Value  of T: {}'
+      .format(titanic_data.loc[titanic_data['Cabin'] == 'T', 'Fare']
+             .iloc[0]))
+plt.title('Spread of Prices by Deck')
+plt.savefig('figures/deck_price_spread.png')
+
+
+# How about ports because I want to mix things up with a line graph
+
+# In[18]:
+
+(titanic_data.groupby(['Embarked', 'Pclass'])
+            ['Fare'].median()
+            .unstack(level=1)
+            .reindex(list('SCQ'))
+        .plot(subplots=True, figsize=(6, 6)))
+plt.gcf().suptitle('Price from Ports: By Class')
+plt.gcf().savefig('figures/price_from_ports.png')
 
