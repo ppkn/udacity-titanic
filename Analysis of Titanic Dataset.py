@@ -58,7 +58,8 @@ titanic_data.isnull().sum()
 # The two questions we are mainly focusing on:
 # * What impact did sex, age, class, and cabin location have on chances of survival?
 # * Was ticket price based on more than passenger class, e.g. did the port of embarkation play a role?
-# 
+
+# #### Limitations
 # This analysis will rely on:
 # 1. Observed differences in proportion of survivors among groups, and
 # 2. Differences in ticket price among groups  
