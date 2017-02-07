@@ -34,6 +34,19 @@ titanic_data = pd.read_csv('titanic-data.csv')
 titanic_data.head()
 
 
+# ### Missing Info
+# 
+# Above it looks like three passengers stayed in Cabin number "NaN." This wasn't an actual cabin, these are just missing values. There may be other columns with missing values too.
+
+# In[30]:
+
+print("Number of rows: {}".format(len(titanic_data)))
+titanic_data.isnull().sum()
+
+
+# Above we see that *Age*, *Cabin*, and *Embarked* have missing values. *Cabin* is the worst of these with 687 of 891 values missing. These can cause problems when trying to create a predictive model. We may be missing cabin information for passengers because they didn't survive. In this case, a missing cabin number can be a predictor for survival.  
+# For most of the present analysis, missing values will be included.
+
 # Each row contains information about a passenger. Some of these column names can be confusing. Thankfully Kaggle provided context<sup>[2](#Footnotes)</sup>:
 # * **Survived** only has two values, 0 and 1. One means they survived and zero means they didn't.
 # * **Pclass** refers to the passenger class (First Class down to steerage).
@@ -149,7 +162,7 @@ def to_mwch(df):
     if df['Age'] < 14:
         return 'child'
     else:
-        return df['Sex']
+        return df['Sex'] # Missing age values are also included here
 
 
 # In[11]:
@@ -164,7 +177,7 @@ plt.title('% Survivors by Men, Women, and Children')
 plt.savefig('figures/per_survivors_mwch.png')
 
 
-# It looks like those under the age of 14 had a good chance of getting off the ship, but adult women were still better off. This might be related to a child's sensitivity to cold temperatures, and would be a good thing to look out for when reading individual accounts.
+# It looks like those under the age of 14 had a good chance of getting off the ship, but adult women were still better off. This might be related to a child's sensitivity to cold temperatures, and would be a good thing to look out for when reading individual accounts. The 177 passengers for which we had no age are grouped into gender here. Ideally, only adults have unknown ages, but we can't be sure why the values are missing. The hope is that missing age values for children are randomly missing. That way, the proportion of children that survived would be about the same.
 
 # ### Stay classy 1912
 # > Woman: I didn't know we had a king!  I thought we were autonomous collective.  
@@ -215,6 +228,7 @@ plt.savefig('figures/per_survivors_deck.png')
 
 # There is a little bit more information to unpack here. It looks like B, D, and E were the best places to be, C and F were so-so, and A and G were the worst places. It makes sense that the people on the lowest deck (G) had a low chance of survival. They were the furthest from the lifeboats. But those staying on deck A had an even lower chance. These people were presumably closest to the lifeboats. Why would they have the lowest chance of survival? After spending way too much time searching and not finding any answers, I leave this explanation as an exercise for the reader.  
 # There is also a number of passengers for which we have no cabin information. There could be a couple reasons for this. Maybe they weren't assigned a cabin to begin with. But one reason that may help explain the low survival rate is that we can get more information from those who survived. We have the cabin numbers of "those who lived to tell the tale." If the "No Info" group had survived, there might be more info.  
+# It should be noted that we don't have cabin info for 77% of the passengers. We would expect this "No Info" group to have a similar survival rate to the total population of passengers. Overall, 38% of passengers survived, but only 30% of "No info" passengers survived. We just discussed why they might have a below average survival rate.
 # You may have also noticed that nobody from deck T survived. T was the very top deck, also known as the "Boat Deck." Here's a list T-deck passengers.
 
 # In[15]:
@@ -289,8 +303,8 @@ plt.title('Spread of Prices by Deck')
 plt.savefig('figures/deck_price_spread.png')
 
 
-# Most of the price variation comes from the B and C decks. These decks probably housed first class passengers, who seem to be more vulnerable to [information asymmetry](https://en.wikipedia.org/wiki/Information_asymmetry).
-# 
+# Most of the price variation comes from the B and C decks. These decks probably housed first class passengers, who seem to be more vulnerable to [information asymmetry](https://en.wikipedia.org/wiki/Information_asymmetry).  
+# Remember that most of our passengers fell into the "No Info" category, so we can't be certain that this is representative of all the deck prices on the Titanic.
 
 # ### Now arriving at...
 # 

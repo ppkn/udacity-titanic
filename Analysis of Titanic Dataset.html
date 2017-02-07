@@ -11924,6 +11924,76 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Missing-Info">Missing Info<a class="anchor-link" href="#Missing-Info">&#182;</a></h3><p>Above it looks like three passengers stayed in Cabin number "NaN." This wasn't an actual cabin, these are just missing values. There may be other columns with missing values too.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of rows: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">titanic_data</span><span class="p">)))</span>
+<span class="n">titanic_data</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Number of rows: 891
+</pre>
+</div>
+</div>
+
+<div class="output_area"><div class="prompt output_prompt">Out[30]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>PassengerId      0
+Survived         0
+Pclass           0
+Name             0
+Sex              0
+Age            177
+SibSp            0
+Parch            0
+Ticket           0
+Fare             0
+Cabin          687
+Embarked         2
+dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Above we see that <em>Age</em>, <em>Cabin</em>, and <em>Embarked</em> have missing values. <em>Cabin</em> is the worst of these with 687 of 891 values missing. These can cause problems when trying to create a predictive model. We may be missing cabin information for passengers because they didn't survive. In this case, a missing cabin number can be a predictor for survival.<br>
+For most of the present analysis, missing values will be included.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Each row contains information about a passenger. Some of these column names can be confusing. Thankfully Kaggle provided context<sup>[2](#Footnotes)</sup>:</p>
 <ul>
 <li><strong>Survived</strong> only has two values, 0 and 1. One means they survived and zero means they didn't.</li>
@@ -12759,7 +12829,7 @@ DTLcJalBhrskNchwl6QGGe6S1CDDXZIa9P8Bu15+5TAooIQAAAAASUVORK5CYII=
     <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Age&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;child&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Sex&#39;</span><span class="p">]</span> <span class="c1"># Missing age values are also included here</span>
 </pre></div>
 
 </div>
@@ -12944,7 +13014,7 @@ ZcjhbmaWIYe7mVmGHO5mZhlyuJuZZcjhbmaWIYe7mVmG/j/shp6an4kn1gAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It looks like those under the age of 14 had a good chance of getting off the ship, but adult women were still better off. This might be related to a child's sensitivity to cold temperatures, and would be a good thing to look out for when reading individual accounts.</p>
+<p>It looks like those under the age of 14 had a good chance of getting off the ship, but adult women were still better off. This might be related to a child's sensitivity to cold temperatures, and would be a good thing to look out for when reading individual accounts. The 177 passengers for which we had no age are grouped into gender here. Ideally, only adults have unknown ages, but we can't be sure why the values are missing. The hope is that missing age values for children are randomly missing. That way, the proportion of children that survived would be about the same.</p>
 
 </div>
 </div>
@@ -13320,6 +13390,7 @@ RU5ErkJggg==
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>There is a little bit more information to unpack here. It looks like B, D, and E were the best places to be, C and F were so-so, and A and G were the worst places. It makes sense that the people on the lowest deck (G) had a low chance of survival. They were the furthest from the lifeboats. But those staying on deck A had an even lower chance. These people were presumably closest to the lifeboats. Why would they have the lowest chance of survival? After spending way too much time searching and not finding any answers, I leave this explanation as an exercise for the reader.<br>
 There is also a number of passengers for which we have no cabin information. There could be a couple reasons for this. Maybe they weren't assigned a cabin to begin with. But one reason that may help explain the low survival rate is that we can get more information from those who survived. We have the cabin numbers of "those who lived to tell the tale." If the "No Info" group had survived, there might be more info.<br>
+It should be noted that we don't have cabin info for 77% of the passengers. We would expect this "No Info" group to have a similar survival rate to the total population of passengers. Overall, 38% of passengers survived, but only 30% of "No info" passengers survived. We just discussed why they might have a below average survival rate.
 You may have also noticed that nobody from deck T survived. T was the very top deck, also known as the "Boat Deck." Here's a list T-deck passengers.</p>
 
 </div>
@@ -14115,7 +14186,8 @@ ksMTTgX+U5IbgROANw9oPfNarpdAkKSOc49ekjrOoJekjjPoJanjDHpJ6jiDXpI6zqCXpI4z6CWp
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Most of the price variation comes from the B and C decks. These decks probably housed first class passengers, who seem to be more vulnerable to <a href="https://en.wikipedia.org/wiki/Information_asymmetry">information asymmetry</a>.</p>
+<p>Most of the price variation comes from the B and C decks. These decks probably housed first class passengers, who seem to be more vulnerable to <a href="https://en.wikipedia.org/wiki/Information_asymmetry">information asymmetry</a>.<br>
+Remember that most of our passengers fell into the "No Info" category, so we can't be certain that this is representative of all the deck prices on the Titanic.</p>
 
 </div>
 </div>
