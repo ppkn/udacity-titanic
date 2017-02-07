@@ -38,7 +38,7 @@ titanic_data.head()
 # 
 # Above it looks like three passengers stayed in Cabin number "NaN." This wasn't an actual cabin, these are just missing values. There may be other columns with missing values too.
 
-# In[30]:
+# In[3]:
 
 print("Number of rows: {}".format(len(titanic_data)))
 titanic_data.isnull().sum()
@@ -72,7 +72,7 @@ titanic_data.isnull().sum()
 
 # ## Part I. Survivors
 
-# In[3]:
+# In[4]:
 
 (titanic_data['Survived'].value_counts()                     # Count how many survived
                          .rename({0: 'Died', 1: 'Survived'}) # Rename indicies
@@ -86,7 +86,7 @@ plt.savefig('figures/per_survivors.png')
 # 
 # So what factors did contribute to the survival of some passengers? The one thing I remember from Titanic is that Jack dies and Rose lives. (That, and Leonardo Decaprio toasting like [he does in every movie](http://www.vulture.com/2013/06/gif-history-of-leo-dicaprio-raising-glasses.html)). Let's use this as a starting point.
 
-# In[4]:
+# In[5]:
 
 gender_survived_counts = (titanic_data.loc[titanic_data['Survived'] == 1, 'Sex'] # Select gender of just the survivors
                                       .value_counts())                           # Get the counts of each gender
@@ -95,7 +95,7 @@ print(gender_survived_counts)
 
 # Wow! More than twice as many women survived as men. It's much easier to notice those types of relationships in a chart, though. Take a look.
 
-# In[5]:
+# In[6]:
 
 gender_survived_counts.plot(kind='bar', rot=0)     # Rotate the labels to make them easy to read.
 plt.title('Num Survivors by Gender')
@@ -104,7 +104,7 @@ plt.savefig('figures/num_survivors_gender.png') # To track changes in version co
 
 # But this might be deceptive. Maybe there were just more women on the Titanic to begin with. Let's get those exact counts along with the chart this time.
 
-# In[6]:
+# In[7]:
 
 def pipe_print(x):
     '''Prints *and* returns data
@@ -114,7 +114,7 @@ def pipe_print(x):
     return x
 
 
-# In[7]:
+# In[8]:
 
 (titanic_data['Sex'].value_counts()  # Count *all* passengers by gender
                     .sort_index()     # Sort for consistent order of bars
@@ -126,7 +126,7 @@ plt.savefig('figures/num_gender.png')
 
 # On the contrary, men grossly outnumbered women. There is a way to take this into account while at the same time comparing survivors. Getting the *proportion* of those who survived in each group will "normalize" the data for a better comparison. From now on, we'll just use this approach to compare different groups of passengers.
 
-# In[8]:
+# In[9]:
 
 # This will be used a lot.
 def percent_survived(group, df=titanic_data):
@@ -138,7 +138,7 @@ def percent_survived(group, df=titanic_data):
               .loc[:, 1])            # Get percentage of just the survivors ('Survived' == 1)
 
 
-# In[9]:
+# In[10]:
 
 (percent_survived('Sex').pipe(pipe_print) # Print percent of each gender that survived
                         .plot(kind='bar', rot='0'))
@@ -152,7 +152,7 @@ plt.savefig('figures/per_survivors_gender.png')
 # 
 # Not all male passengers were the same age as Jack, though. There were also children aboard. It is useful to consider these travelers as separate from men and women when it comes to survival. Male children would have a spot on the lifeboats and adult females may be more willing to give their life for that of a child. Some rearrangement of the data can show us the difference in those groups.
 
-# In[10]:
+# In[11]:
 
 def to_mwch(df):
     '''Returns whether a passenger is a child
@@ -166,7 +166,7 @@ def to_mwch(df):
         return df['Sex'] # Missing age values are also included here
 
 
-# In[11]:
+# In[12]:
 
 (titanic_data.assign(MWCh=lambda x:                   # Set a Man, Woman, Child column
                             x.apply(to_mwch, axis=1)) # using the above function
@@ -188,7 +188,7 @@ plt.savefig('figures/per_survivors_mwch.png')
 # 
 # The Titanic [Wikipedia article](https://en.wikipedia.org/wiki/Passengers_of_the_RMS_Titanic) discusses a little bit about the socio-economic diversity of the Titanic passengers. This is what their breakdown looks like.
 
-# In[12]:
+# In[13]:
 
 (percent_survived('Pclass').pipe(pipe_print)
                            .plot(kind='bar', rot=0)) # Plot the percent survivors for each Class
@@ -201,7 +201,7 @@ plt.savefig('figures/per_survivors_class.png')
 # ### Decks
 # According to my research then, that observed difference is mostly due to where the passengers were staying. Thankfully, the cabin numbers give us upfront information on where the cabin was located. The first letter of each cabin number was the deck they were staying on, with the lower decks with the later letters. There is also a special deck T, but I'll get back to that.
 
-# In[13]:
+# In[14]:
 
 def to_deck(cabin):
     '''Return the deck letter of
@@ -214,7 +214,7 @@ def to_deck(cabin):
         return cabin[0]
 
 
-# In[14]:
+# In[15]:
 
 with_decks = titanic_data.assign(Deck=lambda x:            # Set the deck column
                                 x['Cabin'].apply(to_deck)) # using the function above
@@ -222,7 +222,7 @@ with_decks = titanic_data.assign(Deck=lambda x:            # Set the deck column
 (percent_survived('Deck', with_decks)            # Get percent of survivors of each deck
         .reindex(list('TABCDEFG') + ['No Info']) # Sort so 'No Info' shows last
         .pipe(pipe_print)                        # Print exact values for each percentage
-        .plot(kind='bar'))
+        .plot(kind='bar', rot=0))
 plt.title('% Survivors by Deck')
 plt.savefig('figures/per_survivors_deck.png')
 
@@ -232,7 +232,7 @@ plt.savefig('figures/per_survivors_deck.png')
 # It should be noted that we don't have cabin info for 77% of the passengers. We would expect this "No Info" group to have a similar survival rate to the total population of passengers. Overall, 38% of passengers survived, but only 30% of "No info" passengers survived. We just discussed why they might have a below average survival rate.
 # You may have also noticed that nobody from deck T survived. T was the very top deck, also known as the "Boat Deck." Here's a list T-deck passengers.
 
-# In[15]:
+# In[16]:
 
 titanic_data[with_decks['Deck'] == 'T']
 
@@ -245,7 +245,7 @@ titanic_data[with_decks['Deck'] == 'T']
 # 
 # I like to travel internationally every year. It doesn't always happen, but usually my wife can find the most amazing deals on flights. I don't often think about it, but those on the flight next to us may have paid a completely different price, even though we are both in Economy Class. There could be a number of reasons that the fares varied on the Titanic. Let's start out with some summary statistics.
 
-# In[16]:
+# In[17]:
 
 fares = titanic_data['Fare']
 fares.describe()
@@ -254,13 +254,15 @@ fares.describe()
 # Some people got a free ride, half of the passengers got on for less than £15, 75% of people didn't have to pay more than £31, and some sucker paid £512. Wait.... £512! Sometimes it can be hard to put these numbers into perspective. £8 adjusted to 2017 US dollars is about $\$$1080.<sup>[5](#Footnotes)</sup> Double it. Then double that number. Double it again. Now double it three more times. Did you get $\$$69,000? Yeah, me too.  
 # Those high prices will make it hard to see what the spread of *most* fares are, so let's just take a look at the bottom 90%.
 
-# In[17]:
+# In[18]:
 
 ninetieth = fares.quantile(0.90)   # Get the value of the 90th percentile
 bins = np.arange(0, ninetieth, 10) # Create equal sized bins up to the 90th percentile
 
-(titanic_data.loc[titanic_data['Fare'] < ninetieth, 'Fare'] # Only get fares up to 90th percentile
-             .hist(bins=bins))
+ax = (titanic_data.loc[titanic_data['Fare'] < ninetieth, 'Fare'] # Only get fares up to 90th percentile
+                  .hist(bins=bins))
+ax.set_xlabel('Price (£)')
+ax.set_ylabel('# of passengers')
 plt.title('Fares of the Bottom 90%')
 plt.savefig('figures/fares_bottom_90.png')
 
@@ -269,20 +271,23 @@ plt.savefig('figures/fares_bottom_90.png')
 # 
 # It would make sense that higher class tickets cost more, but we should double check to make sure that's the case 
 
-# In[18]:
+# In[19]:
 
 (titanic_data.pivot(columns='Pclass', values='Fare') # Reshape to make Pclass Series of fares
-             .plot(kind='box'))
+             .plot(kind='box')
+             .set_ylabel('Price (£)'))
+
 plt.title('Spread of Prices by Class (with outliers)')
 plt.savefig('figures/class_price_spread_w_outliers.png')
 
 
 # Ugh, there are those high prices again, making it hard to see the general picture. Here's the same plot without the outliers.
 
-# In[19]:
+# In[20]:
 
 (titanic_data.pivot(columns='Pclass', values='Fare')
-             .plot(kind='box', showfliers=False)) # Remove outliers
+             .plot(kind='box', showfliers=False) # Remove outliers
+             .set_ylabel('Price (£)'))
 plt.title('Spread of Prices by Class')
 plt.savefig('figures/class_price_spread.png')
 
@@ -293,13 +298,14 @@ plt.savefig('figures/class_price_spread.png')
 
 # Separating the fares by decks may also reveal some information in price differences. 
 
-# In[20]:
+# In[21]:
 
 (titanic_data.assign(Deck=lambda x:              # Add deck column using
                     x['Cabin'].apply(to_deck))   # function from above
             .pivot(columns='Deck', values='Fare')
             [list('TABCDEFG') + ['No Info']]     # Sort from top to bottom
-            .plot(kind='box', showfliers=False)) # Remove outliers
+            .plot(kind='box', showfliers=False)  # Remove outliers
+            .set_ylabel('Price (£)'))
 plt.title('Spread of Prices by Deck')
 plt.savefig('figures/deck_price_spread.png')
 
@@ -311,7 +317,7 @@ plt.savefig('figures/deck_price_spread.png')
 # 
 # The Titanic stopped at three ports before crossing the Atlantic. One would expect there to be a discount for hopping on later, but sometimes our expectations aren't correct. Let's find out!
 
-# In[21]:
+# In[22]:
 
 (titanic_data.groupby(['Embarked', 'Pclass']) # We'll want to split the fares up by class as well as embarked
             ['Fare'].median()                 # Get the median for each port of embarkation for each class
