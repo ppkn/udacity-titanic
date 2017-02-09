@@ -1,3 +1,5 @@
+![Titanic Sinking](titanic.jpg)
+
 # Investigating the Titanic Dataset
 
 ## To the Udacity Grader
